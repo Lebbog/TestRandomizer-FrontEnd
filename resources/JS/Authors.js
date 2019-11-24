@@ -7,7 +7,6 @@ $(document).ready(function() {
 
   $("#deleteAuthor").click(function() {
     if (toDelete != null) {
-      console.log("about to be in delete author");
       deleteAuthor(toDelete);
     }
   });
@@ -19,9 +18,7 @@ $(document).ready(function() {
   // });
   $(document).on("click", ".delete", function() {
     var row = $(this).closest("tr")[0];
-    //console.log(row.cells[2].innerHTML);
-    toDelete = row.cells[2].innerHTML;
-    deleteAuthor(toDelete);
+    toDelete = row.cells[1].innerHTML;
   });
 });
 
@@ -32,13 +29,13 @@ function getAuthors() {
     type: "GET"
   });
 }
-
+//<td><input type="checkbox" id='checkbox${counter}' name="options[]" value="1"></input></td>
 function fillTable(authors) {
   const tableBody = document.getElementById("authors");
   let authorsHtml = "";
   var counter = 1;
   for (let author of authors) {
-    authorsHtml += `<tr><td><input type="checkbox" id='checkbox${counter}' name="options[]" value="1"></input></td>
+    authorsHtml += `<tr>
     <td>${author.name}</td><td>${author.authorId}</td><td><a href="#deleteAuthorModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
     counter++;
   }
@@ -65,14 +62,11 @@ function addAuthor(authorName) {
   });
 }
 function deleteAuthor(authorId) {
-  console.log("in delete author");
-  const url = "/api/v1/testrandomizer/authors/" + authorId;
-  console.log(url);
+  const url = "http://localhost:8080/api/v1/testrandomizer/authors/" + authorId;
   $.ajax({
     url: url,
     type: "DELETE",
     success: function(result) {
-      console.log(result);
       toDelete = null;
     }
   });
