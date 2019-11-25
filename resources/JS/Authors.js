@@ -10,6 +10,9 @@ $(document).ready(function() {
       deleteAuthor(toDelete);
     }
   });
+  $("#cancelDelete").click(function() {
+    toDelete = null;
+  });
   // $(document).on("change", ":checkbox", function() {
   //   if (this.checked) {
   //     var row = $(this).closest("tr")[0];
@@ -18,7 +21,7 @@ $(document).ready(function() {
   // });
   $(document).on("click", ".delete", function() {
     var row = $(this).closest("tr")[0];
-    toDelete = row.cells[1].innerHTML;
+    toDelete = row.cells[0].innerHTML;
   });
 });
 
@@ -36,7 +39,7 @@ function fillTable(authors) {
   var counter = 1;
   for (let author of authors) {
     authorsHtml += `<tr>
-    <td>${author.name}</td><td>${author.authorId}</td><td><a href="#deleteAuthorModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    <td>${author.authorId}</td><td>${author.name}</td><td><a href="#deleteAuthorModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
     counter++;
   }
   tableBody.innerHTML = authorsHtml;
