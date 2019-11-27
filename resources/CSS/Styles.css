@@ -1,4 +1,10 @@
+.buttonHolder {
+  text-align: center;
+}
 #numTests {
+  text-align: center;
+}
+.heading-holder {
   text-align: center;
 }
 #createTests {
