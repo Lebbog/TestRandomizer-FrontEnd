@@ -15,6 +15,7 @@ $(document).ready(function() {
   $(document).on("click", ".delete", function() {
     var row = $(this).closest("tr")[0];
     toDelete = row.cells[0].innerHTML;
+    console.log(toDelete);
   });
 });
 
@@ -32,7 +33,7 @@ function fillTable(books) {
   var counter = 1;
   for (let book of books) {
     booksHtml += `<tr>
-    <td>${book.bookId}</td><td>${book.title}</td><td>${book.authorId}</td><td><a href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    <td style="display:none;">${book.bookId}</td><td style="display:none;">${book.authorId}</td><td>${book.title}</td><td>${book.authorName}</td><td><a href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
     counter++;
   }
   tableBody.innerHTML = booksHtml;
