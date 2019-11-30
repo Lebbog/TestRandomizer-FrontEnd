@@ -1,48 +1,76 @@
 $(document).ready(function() {
-  getBooks().done(fillTable);
+  let authorsM = new Map();
+  let booksM = new Map();
   let toDelete = null;
+  getBooks(booksM).done(fillTable); //Populate book of tables
+  getAuthors(authorsM).done(fillDropDown); //populate dropdown of available authors
+
   $("#addBook").click(function() {
-    addBook($("#bookTitle").val(), $("#authorId").val());
+    addBook($("#bookTitle").val(), $("#authors").val(), authorsM);
   });
   $("#deleteBook").click(function() {
     if (toDelete != null) {
-      deleteBook(toDelete);
+      deleteBook(booksM.get(parseInt(toDelete)).bookId);
     }
   });
   $("#cancelDelete").click(function() {
     toDelete = null;
   });
+
   $(document).on("click", ".delete", function() {
-    var row = $(this).closest("tr")[0];
-    toDelete = row.cells[0].innerHTML;
-    console.log(toDelete);
+    toDelete = $(this).attr("id");
   });
 });
-
-function getBooks() {
+function getAuthors(authorsM) {
+  const url = "http://localhost:8080/api/v1/testrandomizer/authors";
+  return $.ajax({
+    url: url,
+    type: "GET",
+    custom: authorsM
+  });
+}
+function fillDropDown(authors) {
+  authorsM = this.custom;
+  const dropDown = document.getElementById("authors");
+  let authorsHtml = "";
+  var counter = 1;
+  for (let author of authors) {
+    authorsHtml += `<option value="${counter}">${author.name}</option>`;
+    authorsM.set(counter, author);
+    counter++;
+  }
+  dropDown.innerHTML = authorsHtml;
+}
+function myFunction() {
+  document.getElementById("myDropdown").classList.toggle("show");
+}
+function getBooks(booksM) {
   const url = "http://localhost:8080/api/v1/testrandomizer/books";
   return $.ajax({
     url: url,
-    type: "GET"
+    type: "GET",
+    custom: booksM
   });
 }
-//<td><input type="checkbox" id='checkbox${counter}' title="options[]" value="1"></input></td>
 function fillTable(books) {
+  booksM = this.custom;
   const tableBody = document.getElementById("books");
   let booksHtml = "";
   var counter = 1;
   for (let book of books) {
     booksHtml += `<tr>
-    <td style="display:none;">${book.bookId}</td><td style="display:none;">${book.authorId}</td><td>${book.title}</td><td>${book.authorName}</td><td><a href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    <td>${book.title}</td><td>${book.authorName}</td><td><a id="${counter}" href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    booksM.set(counter, book);
     counter++;
   }
   tableBody.innerHTML = booksHtml;
 }
-function addBook(booktitle, authorId) {
+function addBook(booktitle, authorKey, authorsM) {
+  let author = authorsM.get(parseInt(authorKey));
   var book = {
     title: booktitle
   };
-  const url = "http://localhost:8080/api/v1/testrandomizer/authors/" + authorId + "/books";
+  const url = "http://localhost:8080/api/v1/testrandomizer/authors/" + author.authorId + "/books";
   $.ajax({
     type: "POST",
     contentType: "application/json",

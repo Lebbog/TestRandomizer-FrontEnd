@@ -70,6 +70,8 @@
           </thead>
           <tbody id="books"></tbody>
         </table>
+                <!-- <select id="authors">
+                </select>    -->
       </div>
     </div>
     <div id="addBookModal" class="modal fade">
@@ -86,10 +88,11 @@
               <div class="form-group">
                 <label>Title</label>
                 <input id="bookTitle" type="text" class="form-control" required />
-                <label>AuthorId</label>
-                <input id="authorId" type="text" class="form-control" required />
+                <label>Author</label><br>
+                <select required id="authors">
+                </select>  
+                </div>
               </div>
-            </div>
             <div class="modal-footer">
               <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel" />
               <input id="addBook" type="submit" class="btn btn-success" value="Add" />
