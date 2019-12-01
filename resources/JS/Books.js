@@ -1,10 +1,14 @@
 $(document).ready(function() {
   let authorsM = new Map();
   let booksM = new Map();
-  let toDelete = null;
-  getBooks(booksM).done(fillTable); //Populate book of tables
+  // let booksJson = {};
+  var state = {
+    querySet: {},
+    page: 1,
+    rows: 5
+  };
+  getBooks(booksM, state); //Populate book of tables
   getAuthors(authorsM).done(fillDropDown); //populate dropdown of available authors
-
   $("#addBook").click(function() {
     addBook($("#bookTitle").val(), $("#authors").val(), authorsM);
   });
@@ -21,6 +25,18 @@ $(document).ready(function() {
     toDelete = $(this).attr("id");
   });
 });
+function getBooks(booksM, state) {
+  const url = "http://localhost:8080/api/v1/testrandomizer/books";
+  return $.ajax({
+    url: url,
+    type: "GET",
+    success: function(json_data, textStatus, jqXHR) {
+      state.querySet = json_data;
+      fillTable(json_data, booksM, state);
+    }
+  });
+}
+
 function getAuthors(authorsM) {
   const url = "http://localhost:8080/api/v1/testrandomizer/authors";
   return $.ajax({
@@ -28,6 +44,32 @@ function getAuthors(authorsM) {
     type: "GET",
     custom: authorsM
   });
+}
+function fillTable(books, booksM, state) {
+  const tableBody = document.getElementById("books");
+  // var data = pagination(state.querySet, state.page, state.rows);
+  // console.log("data: ", data);
+  let booksHtml = "";
+  var counter = 1;
+  for (let book of books) {
+    booksHtml += `<tr>
+    <td>${book.title}</td><td>${book.authorName}</td><td><a id="${counter}" href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    booksM.set(counter, book);
+    counter++;
+  }
+  tableBody.innerHTML = booksHtml;
+}
+function pagination(querySet, page, rows) {
+  var trimStart = (page - 1) * rows;
+  var trimEnd = trimStart + rows;
+
+  var trimmedData = querySet.slice(trimStart, trimEnd);
+
+  var pages = Math.ceil(querySet.length / rows);
+  return {
+    querySet: trimmedData,
+    pages: pages
+  };
 }
 function fillDropDown(authors) {
   authorsM = this.custom;
@@ -44,27 +86,6 @@ function fillDropDown(authors) {
 function myFunction() {
   document.getElementById("myDropdown").classList.toggle("show");
 }
-function getBooks(booksM) {
-  const url = "http://localhost:8080/api/v1/testrandomizer/books";
-  return $.ajax({
-    url: url,
-    type: "GET",
-    custom: booksM
-  });
-}
-function fillTable(books) {
-  booksM = this.custom;
-  const tableBody = document.getElementById("books");
-  let booksHtml = "";
-  var counter = 1;
-  for (let book of books) {
-    booksHtml += `<tr>
-    <td>${book.title}</td><td>${book.authorName}</td><td><a id="${counter}" href="#deleteBookModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
-    booksM.set(counter, book);
-    counter++;
-  }
-  tableBody.innerHTML = booksHtml;
-}
 function addBook(booktitle, authorKey, authorsM) {
   let author = authorsM.get(parseInt(authorKey));
   var book = {
@@ -78,11 +99,11 @@ function addBook(booktitle, authorKey, authorsM) {
     data: JSON.stringify(book),
     dataType: "json",
     success: function(data) {
-      console.log("Data: " + data);
+      console.log(data);
     },
-    error: function(e) {
-      alert("Error!");
-      console.log("ERROR: ", e);
+    error: function(xhr, status, error) {
+      var err = eval("(" + xhr.responseText + ")");
+      alert("Error: " + err.message);
     }
   });
 }

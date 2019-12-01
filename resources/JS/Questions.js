@@ -1,49 +1,134 @@
 $(document).ready(function() {
-  getQuestions().done(fillTable);
+  let booksM = new Map();
   let toDelete = null;
+  getQuestions();
+  getBooks(booksM).done(fillDropDown);
   $("#addQuestion").click(function() {
-    addQuestion($("#questionValue").val(), $("#questionType").val(), $("#bookId").val());
+    console.log($("#questionValue").val());
+    addQuestion($("#questionValue").val(), $("#questionType").val(), $("#books").val(), booksM);
+    //addBook($("#bookTitle").val(), $("#authors").val(), authorsM);
   });
   $("#deleteQuestion").click(function() {
     if (toDelete != null) {
-      deleteQuestion(toDelete);
+      deleteQuestion(questionsM.get(parseInt(toDelete)).questionId);
     }
   });
   $("#cancelDelete").click(function() {
     toDelete = null;
   });
   $(document).on("click", ".delete", function() {
-    var row = $(this).closest("tr")[0];
-    toDelete = row.cells[0].innerHTML;
+    toDelete = $(this).attr("id");
   });
 });
-
+let questionsJson = null;
+var state = {
+  querySet: {},
+  page: 1,
+  rows: 5,
+  window: 5
+};
+var questionsM = new Map();
 function getQuestions() {
   const url = "http://localhost:8080/api/v1/testrandomizer/questions";
   return $.ajax({
     url: url,
-    type: "GET"
+    type: "GET",
+    success: function(json_data, textStatus, jqXHR) {
+      state.querySet = json_data;
+      questionsJson = json_data;
+      fillTable();
+    }
   });
 }
-//<td><input type="checkbox" id='checkbox${counter}' title="options[]" value="1"></input></td>
-function fillTable(questions) {
+
+function fillTable() {
+  var data = pagination(state.querySet, state.page, state.rows);
+  // console.log("data: ", data);
   const tableBody = document.getElementById("questions");
   let questionsHtml = "";
   var counter = 1;
+  var questions = data.querySet;
   for (let question of questions) {
     questionsHtml += `<tr>
-    <td>${question.questionId}</td><td>${question.type}</td><td>${question.value}</td><td>${question.bookId}</td><td><a href="#deleteQuestionModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    <td>${question.bookTitle + " - " + question.authorName}</td><td>${question.type}</td><td>${
+      question.value
+    }</td><td><a id=${counter} href="#deleteQuestionModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
+    questionsM.set(counter, question);
     counter++;
   }
   tableBody.innerHTML = questionsHtml;
+  pageButtons(data.pages);
 }
-function addQuestion(questionValue, type, bookId) {
+function pagination(querySet, page, rows) {
+  var trimStart = (page - 1) * rows;
+  var trimEnd = trimStart + rows;
+
+  var trimmedData = querySet.slice(trimStart, trimEnd);
+
+  var pages = Math.ceil(querySet.length / rows);
+  return {
+    querySet: trimmedData,
+    pages: pages
+  };
+}
+function pageButtons(pages) {
+  var wrapper = document.getElementById("pagination-wrapper");
+  wrapper.innerHTML = "";
+  var maxLeft = state.page - Math.floor(state.window / 2);
+  var maxRight = state.page + Math.floor(state.window / 2);
+  if (maxLeft < 1) {
+    maxLeft = 1;
+    maxRight = state.window;
+  }
+  if (maxRight > pages) {
+    maxLeft = pages - (state.window - 1);
+    maxRight = pages;
+    if (maxLeft < 1) {
+      maxLeft = 1;
+    }
+  }
+  for (var page = maxLeft; page <= maxRight; page++) {
+    wrapper.innerHTML += `<button value=${page} class="page btn btn-sm btn-info">${page}</button>`;
+  }
+  if (state.page != 1) {
+    wrapper.innerHTML = `<button value=${1} class="page btn btn-sm btn-info">&#171; First</button>` + wrapper.innerHTML;
+  }
+  if (state.page != pages) {
+    wrapper.innerHTML += `<button value=${pages} class="page btn btn-sm btn-info">Last &#187;</button>`;
+  }
+  $(".page").on("click", function() {
+    $("#questions").empty();
+    state.page = Number($(this).val());
+    fillTable();
+  });
+}
+function getBooks(booksM) {
+  const url = "http://localhost:8080/api/v1/testrandomizer/books";
+  return $.ajax({
+    url: url,
+    type: "GET",
+    custom: booksM
+  });
+}
+function fillDropDown(books) {
+  booksM = this.custom;
+  const dropDown = document.getElementById("books");
+  let booksHtml = "";
+  var counter = 1;
+  for (let book of books) {
+    booksHtml += `<option value="${counter}">${book.title + " - " + book.authorName}</option>`;
+    booksM.set(counter, book);
+    counter++;
+  }
+  dropDown.innerHTML = booksHtml;
+}
+function addQuestion(questionValue, type, bookKey, booksM) {
+  let book = booksM.get(parseInt(bookKey));
   var question = {
     type: type,
     value: questionValue
   };
-  console.log(question);
-  const url = "http://localhost:8080/api/v1/testrandomizer/books/" + bookId + "/questions/";
+  const url = "http://localhost:8080/api/v1/testrandomizer/books/" + book.bookId + "/questions/";
   $.ajax({
     type: "POST",
     contentType: "application/json",
@@ -53,9 +138,9 @@ function addQuestion(questionValue, type, bookId) {
     success: function(data) {
       console.log("Data: " + data);
     },
-    error: function(e) {
-      alert("Error!");
-      console.log("ERROR: ", e);
+    error: function(xhr, status, error) {
+      var err = eval("(" + xhr.responseText + ")");
+      alert("Error: " + err.message);
     }
   });
 }

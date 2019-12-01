@@ -34,8 +34,8 @@
                   </li>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="./questions.html" target="_blank"
-                    >Questions</a
+                  <a class="nav-link" href="./books.html" target="_blank"
+                    >Books</a
                   >
                 </li>
                 <li class="nav-item active">
@@ -61,15 +61,15 @@
         <table class="table table-striped table-hover">
           <thead>
             <tr>
-              <th>Id</th>
+              <th>Book</th>
               <th>Type</th>
               <th>Question</th>
-              <th>BookId</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody id="questions"></tbody>
         </table>
+        <div id="pagination-wrapper"></div>
       </div>
     </div>
     <div id="addQuestionModal" class="modal fade">
@@ -88,8 +88,9 @@
                 <input id="questionValue" type="text" class="form-control" required />
                 <label>Type</label>
                 <input id="questionType" type="text" class="form-control" required />
-                <label>BookId</label>
-                <input id="bookId" type="text" class="form-control" required />
+                <label>Book</label> <br>
+                <select required id="books">
+                </select>
               </div>
             </div>
             <div class="modal-footer">

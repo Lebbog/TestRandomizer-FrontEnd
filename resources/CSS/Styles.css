@@ -133,7 +133,7 @@ table.table .avatar {
   vertical-align: middle;
   margin-right: 10px;
 }
-.pagination {
+/* .pagination {
   float: right;
   margin: 0 0 5px;
 }
@@ -170,9 +170,9 @@ table.table .avatar {
   float: left;
   margin-top: 10px;
   font-size: 13px;
-}
+} */
 /* Custom checkbox */
-.custom-checkbox {
+/* .custom-checkbox {
   position: relative;
 }
 .custom-checkbox input[type="checkbox"] {
@@ -195,7 +195,7 @@ table.table .avatar {
   border-radius: 2px;
   box-sizing: border-box;
   z-index: 2;
-}
+} */
 .modal .modal-dialog {
   max-width: 400px;
 }
