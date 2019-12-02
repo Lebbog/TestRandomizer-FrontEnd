@@ -1,3 +1,10 @@
+.table-wrapper h3 {
+  text-align: center;
+}
+.search-wrapper {
+  text-align: center;
+  margin-top: 30px;
+}
 .buttonHolder {
   text-align: center;
 }
@@ -52,10 +59,26 @@ body {
   border-color: #cad3e0;
   background: #fff;
   padding: 20px 25px;
-  margin: 30px 0;
+  margin: 20px 0;
   border-radius: 3px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  /* display: block; */
+  height: 70vh;
+  overflow-y: auto;
+  /* display: inline-block; */
 }
+
+/*
+thead.fixedHeader th {
+  background: #c96;
+  border-left: 1px solid #eb8;
+  border-right: 1px solid #b74;
+  border-top: 1px solid #eb8;
+  font-weight: normal;
+  padding: 4px 3px;
+  text-align: left;
+} */
+
 .table-title {
   padding-bottom: 15px;
   background: #435d7d;
@@ -118,21 +141,21 @@ table.table td a {
   text-decoration: none;
   outline: none !important;
 }
-table.table td a:hover {
+/* table.table td a:hover {
   color: #2196f3;
 }
 table.table td a.edit {
   color: #ffc107;
-}
+} */
 table.table td a.delete {
   color: #f44336;
 }
 
-table.table .avatar {
+/* table.table .avatar {
   border-radius: 50%;
   vertical-align: middle;
   margin-right: 10px;
-}
+} */
 /* .pagination {
   float: right;
   margin: 0 0 5px;

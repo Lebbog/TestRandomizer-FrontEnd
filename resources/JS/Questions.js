@@ -19,6 +19,19 @@ $(document).ready(function() {
   $(document).on("click", ".delete", function() {
     toDelete = $(this).attr("id");
   });
+  $("#searchInput").on("keyup", function() {
+    var value = $(this)
+      .val()
+      .toLowerCase();
+    $("#questions tr").filter(function() {
+      $(this).toggle(
+        $(this)
+          .text()
+          .toLowerCase()
+          .indexOf(value) > -1
+      );
+    });
+  });
 });
 let questionsJson = null;
 var state = {
@@ -42,13 +55,12 @@ function getQuestions() {
 }
 
 function fillTable() {
-  var data = pagination(state.querySet, state.page, state.rows);
-  // console.log("data: ", data);
+  //var data = pagination(state.querySet, state.page, state.rows);
   const tableBody = document.getElementById("questions");
   let questionsHtml = "";
   var counter = 1;
-  var questions = data.querySet;
-  for (let question of questions) {
+  //var questions = data.querySet;
+  for (let question of questionsJson) {
     questionsHtml += `<tr>
     <td>${question.bookTitle + " - " + question.authorName}</td><td>${question.type}</td><td>${
       question.value
@@ -57,51 +69,51 @@ function fillTable() {
     counter++;
   }
   tableBody.innerHTML = questionsHtml;
-  pageButtons(data.pages);
+  //pageButtons(data.pages);
 }
-function pagination(querySet, page, rows) {
-  var trimStart = (page - 1) * rows;
-  var trimEnd = trimStart + rows;
+// function pagination(querySet, page, rows) {
+//   var trimStart = (page - 1) * rows;
+//   var trimEnd = trimStart + rows;
 
-  var trimmedData = querySet.slice(trimStart, trimEnd);
+//   var trimmedData = querySet.slice(trimStart, trimEnd);
 
-  var pages = Math.ceil(querySet.length / rows);
-  return {
-    querySet: trimmedData,
-    pages: pages
-  };
-}
-function pageButtons(pages) {
-  var wrapper = document.getElementById("pagination-wrapper");
-  wrapper.innerHTML = "";
-  var maxLeft = state.page - Math.floor(state.window / 2);
-  var maxRight = state.page + Math.floor(state.window / 2);
-  if (maxLeft < 1) {
-    maxLeft = 1;
-    maxRight = state.window;
-  }
-  if (maxRight > pages) {
-    maxLeft = pages - (state.window - 1);
-    maxRight = pages;
-    if (maxLeft < 1) {
-      maxLeft = 1;
-    }
-  }
-  for (var page = maxLeft; page <= maxRight; page++) {
-    wrapper.innerHTML += `<button value=${page} class="page btn btn-sm btn-info">${page}</button>`;
-  }
-  if (state.page != 1) {
-    wrapper.innerHTML = `<button value=${1} class="page btn btn-sm btn-info">&#171; First</button>` + wrapper.innerHTML;
-  }
-  if (state.page != pages) {
-    wrapper.innerHTML += `<button value=${pages} class="page btn btn-sm btn-info">Last &#187;</button>`;
-  }
-  $(".page").on("click", function() {
-    $("#questions").empty();
-    state.page = Number($(this).val());
-    fillTable();
-  });
-}
+//   var pages = Math.ceil(querySet.length / rows);
+//   return {
+//     querySet: trimmedData,
+//     pages: pages
+//   };
+// }
+// function pageButtons(pages) {
+//   var wrapper = document.getElementById("pagination-wrapper");
+//   wrapper.innerHTML = "";
+//   var maxLeft = state.page - Math.floor(state.window / 2);
+//   var maxRight = state.page + Math.floor(state.window / 2);
+//   if (maxLeft < 1) {
+//     maxLeft = 1;
+//     maxRight = state.window;
+//   }
+//   if (maxRight > pages) {
+//     maxLeft = pages - (state.window - 1);
+//     maxRight = pages;
+//     if (maxLeft < 1) {
+//       maxLeft = 1;
+//     }
+//   }
+//   for (var page = maxLeft; page <= maxRight; page++) {
+//     wrapper.innerHTML += `<button value=${page} class="page btn btn-sm btn-info">${page}</button>`;
+//   }
+//   if (state.page != 1) {
+//     wrapper.innerHTML = `<button value=${1} class="page btn btn-sm btn-info">&#171; First</button>` + wrapper.innerHTML;
+//   }
+//   if (state.page != pages) {
+//     wrapper.innerHTML += `<button value=${pages} class="page btn btn-sm btn-info">Last &#187;</button>`;
+//   }
+//   $(".page").on("click", function() {
+//     $("#questions").empty();
+//     state.page = Number($(this).val());
+//     fillTable();
+//   });
+// }
 function getBooks(booksM) {
   const url = "http://localhost:8080/api/v1/testrandomizer/books";
   return $.ajax({

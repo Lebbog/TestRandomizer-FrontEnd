@@ -45,6 +45,12 @@
                   </li>
             </ul>
           </nav>
+          <div class="search-wrapper">
+          <label>
+              <span><strong>Filter Questions:</strong></span>
+          <input placeholder="Enter search term" type="text" id="searchInput">
+        </label>
+      </div>
       <div class="table-wrapper">
         <div class="table-title">
           <div class="row">
@@ -59,7 +65,7 @@
           </div>
         </div>
         <table class="table table-striped table-hover">
-          <thead>
+          <thead class="fixedHeader">
             <tr>
               <th>Book</th>
               <th>Type</th>
@@ -69,7 +75,7 @@
           </thead>
           <tbody id="questions"></tbody>
         </table>
-        <div id="pagination-wrapper"></div>
+        <!-- <div id="pagination-wrapper"></div> -->
       </div>
     </div>
     <div id="addQuestionModal" class="modal fade">
