@@ -29,7 +29,10 @@ $(document).ready(function() {
     if ($("#numTests").val() && !$("#numTests").val() == "") {
       numTests = $("#numTests").val();
     }
-    if (numTests == null) alert("Number of tests cannot be empty!");
+    if (numTests == null) {
+      alert("Number of tests cannot be empty!");
+      return;
+    }
     let bookIds = [];
     let types = [];
     let amounts = [];
@@ -64,7 +67,7 @@ $(document).ready(function() {
       if (idx == amounts.length - 1) endPoint += `${amount}`;
       else endPoint += `${amount},`;
     }
-    console.log(endPoint);
+    //console.log(endPoint);
     getTests(endPoint);
   });
 });
@@ -127,5 +130,27 @@ function getTests(url) {
   });
 }
 function createTests(tests) {
-  console.log(tests);
+  let counter = 1;
+  for (let test of tests) {
+    let testName = "test" + counter;
+    let questions = "";
+    for (let question of test) {
+      questions += question.value + "\n";
+    }
+    var data = new Blob([questions], { type: "text/plain" });
+    // window.URL.revokeObjectURL(textFile);
+    textFile = window.URL.createObjectURL(data);
+    window.location = textFile;
+    counter++;
+  }
+
+  // let text = "dog";
+  // var file = new File([text], "myFilename.txt", { type: "application/octet-stream" });
+  // var blobUrl = (URL || webkitURL).createObjectURL(file);
+  // window.location = blobUrl;
+
+  // var data = new Blob([text], { type: "text/plain" });
+  // // window.URL.revokeObjectURL(textFile);
+  // textFile = window.URL.createObjectURL(data);
+  // window.location = textFile;
 }
