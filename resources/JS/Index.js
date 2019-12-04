@@ -132,25 +132,64 @@ function getTests(url) {
 function createTests(tests) {
   let counter = 1;
   for (let test of tests) {
-    let testName = "test" + counter;
-    let questions = "";
+    let testText = "";
+    let testName = "test " + counter;
+    let preHtml = `<html><head><title>${testName}</title></head><body>`;
+    let innerHtml = ``;
     for (let question of test) {
-      questions += question.value + "\n";
+      testText += question.value + "\n";
+      innerHtml += `<p>${question.value}</p>`;
     }
-    var data = new Blob([questions], { type: "text/plain" });
-    // window.URL.revokeObjectURL(textFile);
-    textFile = window.URL.createObjectURL(data);
-    window.location = textFile;
+    let postHtml = `</body></html>`;
+    let html = preHtml + innerHtml + postHtml;
+    let blob = new Blob(["\ufeff", html], {
+      type: "text/html"
+    });
+
+    let url = (URL || webkitURL).createObjectURL(blob);
+    $("#file-links").append(`<a class="dropdown-item" href="${url}" target="_blank">${testName}</a>`);
     counter++;
   }
-
-  // let text = "dog";
-  // var file = new File([text], "myFilename.txt", { type: "application/octet-stream" });
-  // var blobUrl = (URL || webkitURL).createObjectURL(file);
-  // window.location = blobUrl;
-
-  // var data = new Blob([text], { type: "text/plain" });
-  // // window.URL.revokeObjectURL(textFile);
-  // textFile = window.URL.createObjectURL(data);
-  // window.location = textFile;
+  // let counter = 1;
+  // for (let test of tests) {
+  //   let testText = "";
+  //   let testName = "test " + counter;
+  //   let preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${testName}</title></head><body>`;
+  //   let innerHtml = ``;
+  //   for (let question of test) {
+  //     testText += question.value + "\n";
+  //     innerHtml += `<p>${question.value}</p>`;
+  //   }
+  //   let postHtml = `</body></html>`;
+  //   let html = preHtml + innerHtml + postHtml;
+  //   let blob = new Blob(["\ufeff", html], {
+  //     type: "application/msword"
+  //   });
+  //   var downloadLink = document.createElement("a");
+  //   document.body.appendChild(downloadLink);
+  //   let url = "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+  //   let filename = testName + ".doc";
+  //   if (navigator.msSaveOrOpenBlob) {
+  //     navigator.msSaveOrOpenBlob(blob, filename);
+  //   } else {
+  //     downloadLink.href = url;
+  //     downloadLink.download = filename;
+  //     downloadLink.click();
+  //   }
+  //   counter++;
+  // }
 }
+
+// let file = new File([testText], testName, { type: "text/plain" });
+// let fileUrl = (URL || webkitURL).createObjectURL(file);
+// $("#file-links").append(`<a class="dropdown-item" href="${fileUrl}" target="_blank">${testName}</a>`);
+
+// let text = "dog";
+// var file = new File([text], "myFilename.txt", { type: "application/octet-stream" });
+// var blobUrl = (URL || webkitURL).createObjectURL(file);
+// window.location = blobUrl;
+
+// var data = new Blob([text], { type: "text/plain" });
+// // window.URL.revokeObjectURL(textFile);
+// textFile = window.URL.createObjectURL(data);
+// window.location = textFile;
