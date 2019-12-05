@@ -1,3 +1,13 @@
+#links {
+  display: inline;
+  word-spacing: 0.7em;
+}
+#file-links {
+  height: 200px;
+  overflow-y: auto;
+  position: absolute;
+  width: 100px;
+}
 .table-wrapper h3 {
   text-align: center;
 }
@@ -7,6 +17,7 @@
 }
 .buttonHolder {
   text-align: center;
+  margin-bottom: 10px;
 }
 #numTests {
   text-align: center;

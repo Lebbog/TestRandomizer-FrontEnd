@@ -2,7 +2,6 @@ $(document).ready(function() {
   let booksM = new Map();
   getBooks(booksM).done(fillBooks);
   getTypes();
-
   $("#addQuestion").click(function() {
     $("#testParams").each(function() {
       var tds = "<tr>";
@@ -17,7 +16,6 @@ $(document).ready(function() {
       }
     });
   });
-
   $("#testParams").on("click", "button", function(e) {
     if ($("#testParams tr").length == 1) return;
     $(this)
@@ -70,8 +68,12 @@ $(document).ready(function() {
     //console.log(endPoint);
     getTests(endPoint);
   });
+  $("#downloadTests").click(function() {
+    downloadTests();
+  });
 });
-
+var folder = null;
+var folderZip = null;
 function fillBooks(books) {
   booksM = this.custom;
   const dropDown = document.getElementById("books");
@@ -130,10 +132,14 @@ function getTests(url) {
   });
 }
 function createTests(tests) {
+  $("#links").empty();
+  $("#links").append("<h5>Test Links:</h5>");
+  let zip = new JSZip();
+  let testsFolder = zip.folder("tests");
   let counter = 1;
   for (let test of tests) {
     let testText = "";
-    let testName = "test " + counter;
+    let testName = "test" + counter;
     let preHtml = `<html><head><title>${testName}</title></head><body>`;
     let innerHtml = ``;
     for (let question of test) {
@@ -146,50 +152,55 @@ function createTests(tests) {
       type: "text/html"
     });
 
+    //provide links so each test can be viewed in browser
     let url = (URL || webkitURL).createObjectURL(blob);
-    $("#file-links").append(`<a class="dropdown-item" href="${url}" target="_blank">${testName}</a>`);
+    $("#links").append(`<a href="${url}" target="_blank">${testName.replace(" ", "") + " "}</a>`);
+
+    //Add to zip
+    let filename = testName + ".doc";
+    testsFolder.file(filename, blob);
     counter++;
   }
-  // let counter = 1;
-  // for (let test of tests) {
-  //   let testText = "";
-  //   let testName = "test " + counter;
-  //   let preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${testName}</title></head><body>`;
-  //   let innerHtml = ``;
-  //   for (let question of test) {
-  //     testText += question.value + "\n";
-  //     innerHtml += `<p>${question.value}</p>`;
-  //   }
-  //   let postHtml = `</body></html>`;
-  //   let html = preHtml + innerHtml + postHtml;
-  //   let blob = new Blob(["\ufeff", html], {
-  //     type: "application/msword"
-  //   });
-  //   var downloadLink = document.createElement("a");
-  //   document.body.appendChild(downloadLink);
-  //   let url = "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
-  //   let filename = testName + ".doc";
-  //   if (navigator.msSaveOrOpenBlob) {
-  //     navigator.msSaveOrOpenBlob(blob, filename);
-  //   } else {
-  //     downloadLink.href = url;
-  //     downloadLink.download = filename;
-  //     downloadLink.click();
-  //   }
-  //   counter++;
-  // }
+  folderZip = zip;
+  folder = testsFolder;
+  $("#links").show();
+  $("#downloadTests").show();
+  // zip.generateAsync({ type: "blob" }).then(function(testsFolder) {
+  //   saveAs(testsFolder, "tests.zip");
+  // });
 }
-
-// let file = new File([testText], testName, { type: "text/plain" });
-// let fileUrl = (URL || webkitURL).createObjectURL(file);
-// $("#file-links").append(`<a class="dropdown-item" href="${fileUrl}" target="_blank">${testName}</a>`);
-
-// let text = "dog";
-// var file = new File([text], "myFilename.txt", { type: "application/octet-stream" });
-// var blobUrl = (URL || webkitURL).createObjectURL(file);
-// window.location = blobUrl;
-
-// var data = new Blob([text], { type: "text/plain" });
-// // window.URL.revokeObjectURL(textFile);
-// textFile = window.URL.createObjectURL(data);
-// window.location = textFile;
+// let counter = 1;
+// for (let test of tests) {
+//   let testText = "";
+//   let testName = "test " + counter;
+//   let preHtml = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>${testName}</title></head><body>`;
+//   let innerHtml = ``;
+//   for (let question of test) {
+//     testText += question.value + "\n";
+//     innerHtml += `<p>${question.value}</p>`;
+//   }
+//   let postHtml = `</body></html>`;
+//   let html = preHtml + innerHtml + postHtml;
+//   let blob = new Blob(["\ufeff", html], {
+//     type: "application/msword"
+//   });
+//   var downloadLink = document.createElement("a");
+//   document.body.appendChild(downloadLink);
+//   let url = "data:application/vnd.ms-word;charset=utf-8," + encodeURIComponent(html);
+//   let filename = testName + ".doc";
+//   if (navigator.msSaveOrOpenBlob) {
+//     navigator.msSaveOrOpenBlob(blob, filename);
+//   } else {
+//     downloadLink.href = url;
+//     downloadLink.download = filename;
+//     downloadLink.click();
+//   }
+//   counter++;
+// }
+function downloadTests() {
+  if (folder != null) {
+    folderZip.generateAsync({ type: "blob" }).then(function(folder) {
+      saveAs(folder, "tests.zip");
+    });
+  }
+}
