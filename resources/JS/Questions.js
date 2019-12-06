@@ -19,19 +19,19 @@ $(document).ready(function() {
   $(document).on("click", ".delete", function() {
     toDelete = $(this).attr("id");
   });
-  $("#searchInput").on("keyup", function() {
-    var value = $(this)
-      .val()
-      .toLowerCase();
-    $("#questions tr").filter(function() {
-      $(this).toggle(
-        $(this)
-          .text()
-          .toLowerCase()
-          .indexOf(value) > -1
-      );
-    });
-  });
+  // $("#searchInput").on("keyup", function() {
+  //   var value = $(this)
+  //     .val()
+  //     .toLowerCase();
+  //   $("#questions tr").filter(function() {
+  //     $(this).toggle(
+  //       $(this)
+  //         .text()
+  //         .toLowerCase()
+  //         .indexOf(value) > -1
+  //     );
+  //   });
+  // });
 });
 let questionsJson = null;
 var state = {
@@ -69,6 +69,8 @@ function fillTable() {
     counter++;
   }
   tableBody.innerHTML = questionsHtml;
+  $("#questionsTable").ddTableFilter();
+  //<td><a id=${counter} href="#deleteQuestionModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td>
   //pageButtons(data.pages);
 }
 // function pagination(querySet, page, rows) {
