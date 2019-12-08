@@ -47,8 +47,6 @@ function getAuthors(authorsM) {
 }
 function fillTable(books, booksM, state) {
   const tableBody = document.getElementById("books");
-  // var data = pagination(state.querySet, state.page, state.rows);
-  // console.log("data: ", data);
   let booksHtml = "";
   var counter = 1;
   for (let book of books) {
@@ -58,18 +56,11 @@ function fillTable(books, booksM, state) {
     counter++;
   }
   tableBody.innerHTML = booksHtml;
-}
-function pagination(querySet, page, rows) {
-  var trimStart = (page - 1) * rows;
-  var trimEnd = trimStart + rows;
-
-  var trimmedData = querySet.slice(trimStart, trimEnd);
-
-  var pages = Math.ceil(querySet.length / rows);
-  return {
-    querySet: trimmedData,
-    pages: pages
+  var options = {
+    sortOpt: false,
+    minOptions: 1
   };
+  $("#booksTable").ddTableFilter(options);
 }
 function fillDropDown(authors) {
   authorsM = this.custom;
@@ -99,7 +90,7 @@ function addBook(booktitle, authorKey, authorsM) {
     data: JSON.stringify(book),
     dataType: "json",
     success: function(data) {
-      console.log(data);
+      location.reload();
     },
     error: function(xhr, status, error) {
       var err = eval("(" + xhr.responseText + ")");
@@ -114,6 +105,7 @@ function deleteBook(bookId) {
     type: "DELETE",
     success: function(result) {
       toDelete = null;
+      location.reload();
     }
   });
 }

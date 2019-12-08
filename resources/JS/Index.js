@@ -43,7 +43,7 @@ $(document).ready(function() {
       var col3_value = currentRow.find("#amount").val();
       amounts.push(col3_value);
     });
-    let endPoint = "http://localhost:8080/api/v1/testrandomizer/questions/tests";
+    let endPoint = "http://localhost:8080/api/v1/testrandomizer/questions/specific";
 
     endPoint += "?testAmount=" + numTests;
 

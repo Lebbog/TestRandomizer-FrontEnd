@@ -154,7 +154,7 @@ function addQuestion(questionValue, type, bookKey, booksM) {
     data: JSON.stringify(question),
     dataType: "json",
     success: function(data) {
-      console.log("Data: " + data);
+      location.reload();
     },
     error: function(xhr, status, error) {
       var err = eval("(" + xhr.responseText + ")");
@@ -169,6 +169,7 @@ function deleteQuestion(questionId) {
     type: "DELETE",
     success: function(result) {
       toDelete = null;
+      location.reload();
     }
   });
 }

@@ -1,8 +1,7 @@
+let authorsM = new Map();
+let toDelete = null;
 $(document).ready(function() {
-  let authorsM = new Map();
-  let toDelete = null;
-  getAuthors(authorsM).done(fillTable);
-
+  getAuthors().done(fillTable);
   $("#addAuthor").click(function() {
     addAuthor($("#authorName").val());
   });
@@ -20,27 +19,22 @@ $(document).ready(function() {
   });
 });
 
-function getAuthors(authorsM) {
+function getAuthors() {
   const url = "http://localhost:8080/api/v1/testrandomizer/authors";
   return $.ajax({
     url: url,
-    type: "GET",
-    custom: authorsM
+    type: "GET"
   });
 }
 //<td><input type="checkbox" id='checkbox${counter}' name="options[]" value="1"></input></td>
 function fillTable(authors) {
-  const tableBody = document.getElementById("authors");
-  authorsM = this.custom;
-  let authorsHtml = "";
-  var counter = 1;
+  let counter = 1;
   for (let author of authors) {
-    authorsHtml += `<tr>
-    <td>${author.name}</td><td><a id="${counter}" href="#deleteAuthorModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`;
     authorsM.set(counter, author);
+    $("#authors").append(`<tr>
+    <td>${author.name}</td><td><a id="${counter}" href="#deleteAuthorModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a></td></tr>`);
     counter++;
   }
-  tableBody.innerHTML = authorsHtml;
 }
 function addAuthor(authorName) {
   var author = {
@@ -54,7 +48,7 @@ function addAuthor(authorName) {
     data: JSON.stringify(author),
     dataType: "json",
     success: function(data) {
-      console.log("Data: " + data);
+      location.reload();
     },
     error: function(xhr, status, error) {
       var err = eval("(" + xhr.responseText + ")");
@@ -68,7 +62,7 @@ function deleteAuthor(authorId) {
     url: url,
     type: "DELETE",
     success: function(result) {
-      toDelete = null;
+      location.reload();
     }
   });
 }
