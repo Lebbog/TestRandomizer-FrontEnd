@@ -15,12 +15,35 @@ $(document).ready(function() {
         $(this).append(tds);
       }
     });
+    $(this).prop("disabled", true);
+    $("#create").prop("disabled", true);
+  });
+  $(document).on("keyup", ".form-control", function() {
+    if ($(this).val() == "" || isNaN($(this).val())) {
+      $("#addQuestion").prop("disabled", true);
+      $("#create").prop("disabled", true);
+      if (isNaN($(this).val())) {
+        alert("Amount must be a number");
+        $(this).val("");
+      }
+    } else {
+      $("#addQuestion").prop("disabled", false);
+      $("#create").prop("disabled", false);
+    }
   });
   $("#testParams").on("click", "button", function(e) {
     if ($("#testParams tr").length == 1) return;
     $(this)
       .closest("tr")
       .remove();
+    $("#addQuestion").prop("disabled", false);
+    $("#create").prop("disabled", false);
+  });
+  $("#numTests").keyup(function() {
+    if (isNaN($(this).val())) {
+      alert("Amount must be a number");
+      $(this).val("");
+    }
   });
   $("#create").click(function() {
     let numTests = null;
@@ -139,7 +162,7 @@ function createTests(tests) {
   let counter = 1;
   for (let test of tests) {
     let testText = "";
-    let testName = "test" + counter;
+    let testName = "Test" + counter;
     let preHtml = `<html><head><title>${testName}</title></head><body>`;
     let innerHtml = ``;
     for (let question of test) {
@@ -165,6 +188,7 @@ function createTests(tests) {
   folder = testsFolder;
   $("#links").show();
   $("#downloadTests").show();
+  location.href = "#downloadTests";
   // zip.generateAsync({ type: "blob" }).then(function(testsFolder) {
   //   saveAs(testsFolder, "tests.zip");
   // });
@@ -202,5 +226,6 @@ function downloadTests() {
     folderZip.generateAsync({ type: "blob" }).then(function(folder) {
       saveAs(folder, "tests.zip");
     });
+    // location.reload();
   }
 }

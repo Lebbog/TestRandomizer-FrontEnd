@@ -9,6 +9,14 @@ $(document).ready(function() {
   };
   getBooks(booksM, state); //Populate book of tables
   getAuthors(authorsM).done(fillDropDown); //populate dropdown of available authors
+
+  $("#bookTitle").keyup(function() {
+    if ($(this).val() == "") {
+      $("#addBook").prop("disabled", true);
+    } else {
+      $("#addBook").prop("disabled", false);
+    }
+  });
   $("#addBook").click(function() {
     addBook($("#bookTitle").val(), $("#authors").val(), authorsM);
   });

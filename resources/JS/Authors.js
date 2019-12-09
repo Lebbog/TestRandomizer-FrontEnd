@@ -2,6 +2,15 @@ let authorsM = new Map();
 let toDelete = null;
 $(document).ready(function() {
   getAuthors().done(fillTable);
+
+  $("#authorName").keyup(function() {
+    if ($(this).val() == "") {
+      $("#addAuthor").prop("disabled", true);
+    } else {
+      $("#addAuthor").prop("disabled", false);
+    }
+  });
+
   $("#addAuthor").click(function() {
     addAuthor($("#authorName").val());
   });

@@ -8,6 +8,15 @@ $(document).ready(function() {
     addQuestion($("#questionValue").val(), $("#questionType").val(), $("#books").val(), booksM);
     //addBook($("#bookTitle").val(), $("#authors").val(), authorsM);
   });
+  $(".form-control").keyup(function() {
+    let value = $("#questionValue").val();
+    let type = $("#questionType").val();
+    if (value !== "" && type !== "") {
+      $("#addQuestion").prop("disabled", false);
+    } else {
+      $("#addQuestion").prop("disabled", true);
+    }
+  });
   $("#deleteQuestion").click(function() {
     if (toDelete != null) {
       deleteQuestion(questionsM.get(parseInt(toDelete)).questionId);
