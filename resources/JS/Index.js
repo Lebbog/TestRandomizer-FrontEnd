@@ -1,7 +1,9 @@
+let bookQTypes = new Map();
 $(document).ready(function() {
   let booksM = new Map();
   getBooks(booksM).done(fillBooks);
-  getTypes();
+  getBookQTypes();
+  // getTypes();
   $("#addQuestion").click(function() {
     $("#testParams").each(function() {
       var tds = "<tr>";
@@ -43,6 +45,25 @@ $(document).ready(function() {
     if (isNaN($(this).val())) {
       alert("Amount must be a number");
       $(this).val("");
+    }
+  });
+  $("#books").change(function() {
+    let book = booksM.get(parseInt($(this).val()));
+    let currentRow = $(this).closest("tr");
+    let types = bookQTypes.get(book.bookId);
+    let typesDD = currentRow.find("#types");
+    let typesHtml = ``;
+
+    if (types === undefined) {
+      typesHtml = `<option value=N/A>N/A</option>`;
+      typesDD.html(typesHtml);
+      typesDD.prop("disabled", true);
+    } else {
+      for (let type of types) {
+        typesHtml += `<option value="${type}">${type}</option>`;
+      }
+      typesDD.html(typesHtml);
+      typesDD.prop("disabled", false);
     }
   });
   $("#create").click(function() {
@@ -101,6 +122,7 @@ function fillBooks(books) {
   booksM = this.custom;
   const dropDown = document.getElementById("books");
   let booksHtml = "";
+  booksHtml += `<option disabled selected value> --Select Book-- </option>`;
   var counter = 1;
   for (let book of books) {
     booksHtml += `<option value="${counter}">${book.title + " - " + book.authorName}</option>`;
@@ -110,9 +132,11 @@ function fillBooks(books) {
   dropDown.innerHTML = booksHtml;
 }
 
+//Generic type  fill
 function fillTypes(types) {
   const dropDown = document.getElementById("types");
   let typesHtml = "";
+  // typesHtml += `<option disabled selected value> -- select an option -- </option>`;
   for (let type of types) {
     typesHtml += `<option value="${type}">${type}</option>`;
   }
@@ -128,6 +152,7 @@ function getBooks(booksM) {
   });
 }
 
+//generic get for all kinds of types
 function getTypes() {
   const url = "http://localhost:8080/api/v1/testrandomizer/questions/types";
   return $.ajax({
@@ -135,6 +160,22 @@ function getTypes() {
     type: "GET",
     success: function(json_data, textStatus, jqXHR) {
       fillTypes(json_data);
+    },
+    error: function(e) {
+      console.log(e);
+    }
+  });
+}
+//Types per book
+function getBookQTypes() {
+  const url = "http://localhost:8080/api/v1/testrandomizer/books/questionTypes";
+  return $.ajax({
+    url: url,
+    type: "GET",
+    success: function(json_data, textStatus, jqXHR) {
+      for (let bookType of json_data) {
+        bookQTypes.set(bookType.bookId, bookType.questionTypes);
+      }
     },
     error: function(e) {
       console.log(e);
