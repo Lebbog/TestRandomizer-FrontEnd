@@ -1,14 +1,25 @@
 let bookQTypes = new Map();
 $(document).ready(function() {
   let booksM = new Map();
-  getBooks(booksM).done(fillBooks);
   getBookQTypes();
+  getBooks(booksM).done(fillBooks);
   // getTypes();
   $("#addQuestion").click(function() {
     $("#testParams").each(function() {
       var tds = "<tr>";
       jQuery.each($("tr:last td", this), function() {
-        tds += "<td>" + $(this).html() + "</td>";
+        let $td = $(this).clone();
+        let $child = $td.children().eq(0);
+        switch ($child.attr("id")) {
+          case "types":
+          case "amount":
+            $child.prop("disabled", true);
+            break;
+          default:
+            break;
+        }
+        tds += "<td>" + $td.html() + "</td>";
+        // tds += "<td>" + $(this).html() + "</td>";
       });
       tds += "</tr>";
       if ($("tbody", this).length > 0) {
@@ -20,19 +31,72 @@ $(document).ready(function() {
     $(this).prop("disabled", true);
     $("#create").prop("disabled", true);
   });
-  $(document).on("keyup", ".form-control", function() {
-    if ($(this).val() == "" || isNaN($(this).val())) {
-      $("#addQuestion").prop("disabled", true);
-      $("#create").prop("disabled", true);
-      if (isNaN($(this).val())) {
-        alert("Amount must be a number");
-        $(this).val("");
-      }
-    } else {
+
+  // //Disable buttons based on input
+  // $(document).on("keyup", ".form-control", function() {
+  //   if ($(this).val() == "" || isNaN($(this).val())) {
+  //     $("#addQuestion").prop("disabled", true);
+  //     $("#create").prop("disabled", true);
+  //     if (isNaN($(this).val())) {
+  //       alert("Amount must be a number");
+  //       $(this).val("");
+  //     }
+  //   } else {
+  //     $("#addQuestion").prop("disabled", false);
+  //     $("#create").prop("disabled", false);
+  //   }
+  // });
+
+  //Disable buttons based on input
+  $(document).on("keyup change", ".testInput", function() {
+    let id = $(this).attr("id");
+    let currentRow = $(this).closest("tr");
+    let amount = currentRow.find("#amount");
+    let typesDD = currentRow.find("#types");
+    switch (id) {
+      case "books":
+        let book = booksM.get(parseInt($(this).val()));
+        let types = bookQTypes.get(book.bookId);
+        let typesHtml = ``;
+
+        if (types === undefined) {
+          typesHtml = `<option value=N/A>N/A</option>`;
+          typesDD.html(typesHtml);
+          typesDD.prop("disabled", true);
+        } else {
+          for (let type of types) {
+            typesHtml += `<option value="${type}">${type}</option>`;
+          }
+          typesDD.html(typesHtml);
+          typesDD.prop("disabled", false);
+          amount.prop("disabled", false);
+        }
+        break;
+      // case "types":
+      //   break;
+      case "amount":
+        if ($(this).val() == "" || isNaN($(this).val())) {
+          if (isNaN($(this).val())) {
+            alert("Amount must be a number");
+            $(this).val("");
+            //return;
+          }
+        }
+        break;
+      default:
+        break;
+    }
+    if (!typesDD.is(":disabled") && !amount.is(":disabled") && amount.val()) {
       $("#addQuestion").prop("disabled", false);
       $("#create").prop("disabled", false);
     }
+    // $("#addQuestion").prop("disabled", false);
+    // $("#create").prop("disabled", false);
+
+    // $("#addQuestion").prop("disabled", true);
+    // $("#create").prop("disabled", true);
   });
+
   $("#testParams").on("click", "button", function(e) {
     if ($("#testParams tr").length == 1) return;
     $(this)
@@ -41,31 +105,34 @@ $(document).ready(function() {
     $("#addQuestion").prop("disabled", false);
     $("#create").prop("disabled", false);
   });
+
   $("#numTests").keyup(function() {
     if (isNaN($(this).val())) {
       alert("Amount must be a number");
       $(this).val("");
     }
   });
-  $("#books").change(function() {
-    let book = booksM.get(parseInt($(this).val()));
-    let currentRow = $(this).closest("tr");
-    let types = bookQTypes.get(book.bookId);
-    let typesDD = currentRow.find("#types");
-    let typesHtml = ``;
 
-    if (types === undefined) {
-      typesHtml = `<option value=N/A>N/A</option>`;
-      typesDD.html(typesHtml);
-      typesDD.prop("disabled", true);
-    } else {
-      for (let type of types) {
-        typesHtml += `<option value="${type}">${type}</option>`;
-      }
-      typesDD.html(typesHtml);
-      typesDD.prop("disabled", false);
-    }
-  });
+  // $("#books").change(function() {
+  //   let book = booksM.get(parseInt($(this).val()));
+  //   let currentRow = $(this).closest("tr");
+  //   let types = bookQTypes.get(book.bookId);
+  //   let typesDD = currentRow.find("#types");
+  //   let typesHtml = ``;
+
+  //   if (types === undefined) {
+  //     typesHtml = `<option value=N/A>N/A</option>`;
+  //     typesDD.html(typesHtml);
+  //     typesDD.prop("disabled", true);
+  //   } else {
+  //     for (let type of types) {
+  //       typesHtml += `<option value="${type}">${type}</option>`;
+  //     }
+  //     typesDD.html(typesHtml);
+  //     typesDD.prop("disabled", false);
+  //   }
+  // });
+
   $("#create").click(function() {
     let numTests = null;
     if ($("#numTests").val() && !$("#numTests").val() == "") {
@@ -112,6 +179,7 @@ $(document).ready(function() {
     //console.log(endPoint);
     getTests(endPoint);
   });
+
   $("#downloadTests").click(function() {
     downloadTests();
   });
@@ -122,12 +190,14 @@ function fillBooks(books) {
   booksM = this.custom;
   const dropDown = document.getElementById("books");
   let booksHtml = "";
-  booksHtml += `<option disabled selected value> --Select Book-- </option>`;
+  booksHtml += `<option disabled selected value>--Select Book--</option>`;
   var counter = 1;
   for (let book of books) {
-    booksHtml += `<option value="${counter}">${book.title + " - " + book.authorName}</option>`;
-    booksM.set(counter, book);
-    counter++;
+    if (bookQTypes.get(book.bookId)) {
+      booksHtml += `<option value="${counter}">${book.title + " - " + book.authorName}</option>`;
+      booksM.set(counter, book);
+      counter++;
+    }
   }
   dropDown.innerHTML = booksHtml;
 }
