@@ -89,6 +89,9 @@ $(document).ready(function() {
     if (!typesDD.is(":disabled") && !amount.is(":disabled") && amount.val()) {
       $("#addQuestion").prop("disabled", false);
       $("#create").prop("disabled", false);
+    } else {
+      $("#addQuestion").prop("disabled", true);
+      $("#create").prop("disabled", true);
     }
     // $("#addQuestion").prop("disabled", false);
     // $("#create").prop("disabled", false);
@@ -152,6 +155,10 @@ $(document).ready(function() {
       var col2_value = currentRow.find("#types").val();
       types.push(col2_value);
       var col3_value = currentRow.find("#amount").val();
+      if (!currentRow.find("#amount").val()) {
+        currentRow.find("#amount").val(1);
+        col3_value = 1;
+      }
       amounts.push(col3_value);
     });
     let endPoint = "http://localhost:8080/api/v1/testrandomizer/questions/specific";
@@ -300,9 +307,6 @@ function createTests(tests) {
   $("#links").show();
   $("#downloadTests").show();
   location.href = "#downloadTests";
-  // zip.generateAsync({ type: "blob" }).then(function(testsFolder) {
-  //   saveAs(testsFolder, "tests.zip");
-  // });
 }
 // let counter = 1;
 // for (let test of tests) {
